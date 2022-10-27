@@ -1,0 +1,38 @@
+.list-social {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+}
+img.social-icon-image {
+  width: 30px;
+}
+@media only screen and (max-width: 749px) {
+  .list-social {
+    justify-content: center;
+  }
+}
+
+.list-social__item .icon {
+  height: 1.8rem;
+  width: 1.8rem;
+}
+
+.list-social__link {
+  align-items: center;
+  display: flex;
+  padding: 1.3rem;
+}
+
+.list-social__link:hover .icon {
+  transform: scale(1.07);
+}
+@media all and (min-width: 700px){
+  .footer-block.grid__item.footer-block--menu {
+    text-align: center;
+    max-width: 76rem;
+    margin: 0 auto;
+  }
+  .footer-block li {
+    display: inline;
+  }
+}

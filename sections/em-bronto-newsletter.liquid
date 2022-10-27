@@ -1,0 +1,183 @@
+{% schema %}
+{
+  "name": "Ethel M Bronto Newsletter",
+  "tag": "section",
+  "class": "tw",
+  "settings": [
+    {
+      "id": "background_color",
+      "label": "Background Color",
+      "type": "checkbox",
+      "default": true
+    },
+    {
+      "id": "heading",
+      "label": "Heading",
+      "type": "text",
+      "default": "Sign Up for Exclusive Offers"
+    },
+    {
+      "id": "body",
+      "type": "richtext",
+      "label": "Body",
+      "default": "<p><p><b>Join Our the VIP List & Save 10 on Your First $50+ Order</b></p><p>Sign up for special news, offers, and more!</p><p>Add your birthday and zip code for more offers.</p></p>"
+    },
+    {
+      "id": "thanks_heading",
+      "label": "Thank You Heading",
+      "type": "text",
+      "default": "Your inbox is about to get even more delicious!"
+    },
+    {
+      "id": "thanks_code",
+      "type": "text",
+      "label": "Thank You Code",
+      "default": "Use code WELCOME10 to save $10 when you spend $50+!"
+    },
+    {
+      "id": "thanks_conditions",
+      "type": "richtext",
+      "label": "Thank You Conditions",
+      "default": "<p>Offer valid for next seven days.<br> May not combine with other offers, discounts or promotions. <br>Code may only be used once per customer. <br></p>"
+    }
+  ],
+  "presets": [
+    {
+      "name": "Ethel M Bronto Newsletter (Full)",
+      "settings": {
+        "background_color": true
+      }
+    }
+  ]
+}
+{% endschema %}
+<style>
+  #klaviyo-form{
+    max-width: 550px;
+    margin: auto;
+  }
+  #klaviyo-form button#Subscribe{
+    width: 100%;
+    margin-bottom: 40px;
+  }
+</style>
+<form id="klaviyo-form" action="https://manage.kmail-lists.com/subscriptions/subscribe?a=V5kZdA&g=SKgubS" method="POST">
+  {% if form.posted_successfully? %}
+  <div class="em-bronto-thank-you text-center">
+    <svg xmlns="http://www.w3.org/2000/svg" class="text-primary h-28 w-28 mx-auto my-10" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+    </svg>
+    <h3 id="Newsletter-success--{{ section.id }}" class="font-bold" tabindex="-1">
+      {{ 'newsletter.success' | t }}
+    </h3>
+    <p class="text-primary font-bold">{{ section.settings.thanks_heading }}</p>
+    <p class="font-heading text-5xl leading-snug my-8">{{ section.settings.thanks_code }}</p>
+    <div class="leading-snug opacity-80">
+      {{ section.settings.thanks_conditions }}
+    </div>
+  </div>
+  {% else %}
+    <div class="text-center">
+      <h2 class="font-heading text-5xl my-10">{{ section.settings.heading }}</h1>
+      <p class="bold">{{ section.settings.body }}</p>
+    </div>
+    <div class="flex flex-col">
+      <label for="CustomerEmail--{{ section.id }}">
+        {{ 'newsletter.label' | t }}
+      </label>
+      <input type="hidden" name="contact[tags]" value="newsletter">
+      <input
+        x-model="email"
+        x-init="email = $el.value"
+        id="CustomerEmail--{{ section.id }}"
+        type="email"
+        name="$email"
+        value="{{ form.email }}"
+        class="border p-4 focus:shadow-none"
+        aria-required="true"
+        autocorrect="off"
+        autocapitalize="off"
+        autocomplete="email"
+        {% if form.errors %}
+          autofocus
+          aria-invalid="true"
+          aria-describedby="Newsletter-error--{{ section.id }}"
+        {% elsif form.posted_successfully? %}
+          aria-describedby="Newsletter-success--{{ section.id }}"
+        {% endif %}
+        placeholder="Email"
+        required
+      >
+    </div>
+    <div class="flex flex-col sm:sm:flex-row gap-8">
+      <label for="first-name" class="flex flex-col w-full sm:w-1/2">
+        First name
+        <input
+        id="first-name"
+        type="text"
+        name="$first_name"
+        x-model="name.first"
+        x-init="name.first = $el.value"
+        class="border border-opacity-50 p-4 focus:shadow-none"
+      />
+      </label>
+      <label for="last-name" class="flex flex-col w-full sm:w-1/2">
+        Last name
+        <input
+        id="last-name"
+        type="text"
+        name="$last_name"
+        x-model="name.last"
+        x-init="name.last = $el.value"
+        class="border p-4 focus:shadow-none"
+      />
+      </label>
+    </div>
+
+    <div class="flex flex-col sm:sm:flex-row gap-8">
+      <label for="zipcode" class="flex flex-col w-full sm:w-1/2">
+        Zip Code
+        <input
+          id="zipcode"
+          type="text"
+          maxlength="5"
+          oninput="this.value=this.value.replace(/[^0-9]/g,'');"
+          pattern="\d{5}"
+          name="zip"
+          x-model="zip"
+          x-init="zip = $el.value"
+          class="border p-4 focus:shadow-none"
+        />
+      </label>
+      <label for="birthday" class="flex flex-col w-full sm:w-1/2">
+        Birthday
+        <input
+          id="birthday"
+          type="date"
+          name="date"
+          x-model="birthday"
+          x-init="birthday = $el.value"
+          class="border p-4 focus:shadow-none h-20"
+          max="{{ "today" | date: "%Y-%m-%d"}}"
+        />
+      </label>
+    </div>
+
+    {%- if form.errors -%}
+      <small id="Newsletter-error--{{ section.id }}">{% render 'icon-error' %}{{ form.errors.translated_fields['email'] | capitalize }} {{ form.errors.messages['email'] }}</small>
+    {%- endif -%}
+
+    <img width="100" height="100" class="hidden" x-bind="directives.image" :src="src" aria-hidden="true">
+
+    <button
+      name="commit"
+      id="Subscribe"
+      x-bind="directives.submit"
+      class="bg-primary text-on-primary p-4 mt-8 transition-opacity disabled:opacity-90 disabled:cursor-not-allowed"
+      :disabled="!valid"
+    >
+      Subscribe
+    </button>
+  {% endif %}
+  </form>
+

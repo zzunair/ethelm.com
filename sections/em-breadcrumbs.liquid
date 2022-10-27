@@ -1,0 +1,92 @@
+{% unless template == 'index' or
+          template == 'cart' or
+          template == 'list-collections' or
+          template == '404'
+%}
+
+{% assign currentTemplate = template | split: '.' | first %}
+
+<nav class="breadcrumbs mt-10" role="navigation" aria-label="breadcrumbs">
+  <ol class="flex flex-wrap">
+    <li class="pr-2.5 after:content-after" data-after="&sol;">
+      <a href="/" title="Home" class="hover:underline">Home</a>
+    </li>
+
+  {% case currentTemplate %}
+  {% when 'page' %}
+
+    <li class="pr-2.5 after:content-after" data-after="&sol;">
+      <a href="{{ page.url }}" aria-current="page" class="hover:underline">{{ page.title }}</a>
+    </li>
+
+  {% when 'product' %}
+
+    {% if collection.url %}
+      <li class="pr-2.5 after:content-after" data-after="&sol;">
+        <span class="hover:underline">{{ collection.title | link_to: collection.url }}</span>
+      </li>
+    {% endif %}
+
+    <li>
+      <a class="hover:underline" href="{{ product.url | within: collection }}" aria-current="page">{{ product.title }}</a>
+    </li>
+
+  {% when 'collection' and collection.handle %}
+
+    {% if current_tags %}
+      <li class="pr-2.5 after:content-after" data-after="&sol;"><span class="hover:underline">{{ collection.title | link_to: collection.url }} </span></li>
+      <li>
+        {% capture tag_url %}{{ collection.url }}/{{ current_tags | join: "+"}}{% endcapture %}
+        <a class="hover:underline" href="{{ tag_url }}" aria-current="page">{{ current_tags | join: " + "}}</a>
+      </li>
+    {% else %}
+      <li>
+        <a class="hover:underline" href="{{ collection.url }}" aria-current="page">{{ collection.title }}</a>
+      </li>
+    {% endif %}
+
+  {% when 'blog' %}
+
+    {% if current_tags %}
+      <li class="pr-2.5 after:content-after" data-after="&sol;"><span class="hover:underline">{{ blog.title | link_to: blog.url }}</span></li>
+      <li class="pr-2.5 after:content-after" data-after="&sol;">
+        {% capture tag_url %}{{blog.url}}/tagged/{{ current_tags | join: "+" }}{% endcapture %}
+        <a class="hover:underline" href="{{ tag_url }}" aria-current="page">{{ current_tags | join: " + " }}</a>
+      </li>
+    {% else %}
+      <li>
+        <a class="hover:underline" href="{{ blog.url }}" aria-current="page">{{ blog.title }}</a>
+      </li>
+    {% endif %}
+
+  {% when 'article' %}
+
+    <li class="pr-2.5 after:content-after" data-after="&sol;"><span class="hover:underline">{{ blog.title | link_to: blog.url }}</span></li>
+    <li>
+      <a class="hover:underline" href="{{ article.url }}" aria-current="page">{{ article.title }}</a>
+    </li>
+
+  {% else %}
+
+    <li class="pr-2.5 after:content-after" data-after="&sol;" aria-current="page">
+      <a class="hover:underline" href="{{ request.path }}" aria-current="page">{{ page_title }}</a>
+    </li>
+
+  {% endcase %}
+
+  </ol>
+</nav>
+{% endunless %}
+
+
+{% schema %}
+{
+    "name": "Ethel M Breadcrumbs",
+    "class": "tw page-width",
+    "presets": [
+        {
+            "name":"Ethel M Breadcrumbs"
+        }
+    ]
+}
+{% endschema %}

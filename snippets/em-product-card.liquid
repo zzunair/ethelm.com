@@ -1,0 +1,233 @@
+{% comment %}
+    Forked version:
+    Renders a product card
+
+    Accepts:
+    - product_card_product: {Object} Product Liquid object (optional)
+    - media_size: {String} Size of the product image card. Values are "square" and "portrait". Default is "square" (optional)
+    - show_secondary_image: {Boolean} Show the secondary image on hover. Default: false (optional)
+    - add_image_padding: {Boolean} Enables padding on the image to space out the grid
+    - show_vendor: {Boolean} Show the product vendor. Default: false
+    - show_image_outline: {Boolean} Show card outline. Default: true (optional)
+
+    Usage:
+    {% render 'product-card', show_vendor: section.settings.show_vendor %}
+{% endcomment %}
+
+<div class="card-wrapper">
+    <a href="{{ product_card_product.url | within: collection | default: '#' }}" class="full-unstyled-link">
+        <span class="visually-hidden">{{ product_card_product.title | escape }}</span>
+
+        <div class="card card--product{% if product_card_product.featured_media == nil %} card--text-only card--soft{% endif %}{% if product_card_product.featured_media != nil and show_image_outline %} card--outline{% endif %}" tabindex="-1">
+            <div class="card__inner">
+                {%- if product_card_product.featured_media -%}
+                    {%- liquid
+              assign featured_media_aspect_ratio = product_card_product.featured_media.aspect_ratio
+  
+              if product_card_product.featured_media.aspect_ratio == nil
+                assign featured_media_aspect_ratio = 1
+              endif
+            -%}
+
+                    <div {% if add_image_padding %} class="card__media-full-spacer" {% endif %}>
+                        <div class="media media--transparent media--{{ media_size }} media--hover-effect" {% if media_size == 'adapt' and product_card_product.featured_media %} style="padding-bottom: {{ 1 | divided_by: featured_media_aspect_ratio | times: 100 }}%;" {% endif %}>
+                            <img srcset="{%- if product_card_product.featured_media.width >= 165 -%}{{ product_card_product.featured_media | img_url: '165x' }} 165w,{%- endif -%} {%- if product_card_product.featured_media.width >= 360 -%}{{ product_card_product.featured_media | img_url: '360x' }} 360w,{%- endif -%} {%- if product_card_product.featured_media.width >= 533 -%}{{ product_card_product.featured_media | img_url: '533x' }} 533w,{%- endif -%} {%- if product_card_product.featured_media.width >= 720 -%}{{ product_card_product.featured_media | img_url: '720x' }} 720w,{%- endif -%} {%- if product_card_product.featured_media.width >= 940 -%}{{ product_card_product.featured_media | img_url: '940x' }} 940w,{%- endif -%} {%- if product_card_product.featured_media.width >= 1066 -%}{{ product_card_product.featured_media | img_url: '1066x' }} 1066w{%- endif -%}" src="{{ product_card_product.featured_media | img_url: '533x' }}" sizes="(min-width: {{ settings.page_width }}px) {{ settings.page_width | minus: 130 | divided_by: 4 }}px, (min-width: 990px) calc((100vw - 130px) / 4), (min-width: 750px) calc((100vw - 120px) / 3), calc((100vw - 35px) / 2)" alt="{{ product_card_product.featured_media.alt | escape }}" loading="lazy" class="motion-reduce" width="{{ product_card_product.featured_media.width }}" height="{{ product_card_product.featured_media.height }}">
+
+                            {%- if product_card_product.media[1] != nil and show_secondary_image -%}
+                                <img srcset="{%- if product_card_product.media[1].width >= 165 -%}{{ product_card_product.media[1] | img_url: '165x' }} 165w,{%- endif -%} {%- if product_card_product.media[1].width >= 360 -%}{{ product_card_product.media[1] | img_url: '360x' }} 360w,{%- endif -%} {%- if product_card_product.media[1].width >= 533 -%}{{ product_card_product.media[1] | img_url: '533x' }} 533w,{%- endif -%} {%- if product_card_product.media[1].width >= 720 -%}{{ product_card_product.media[1] | img_url: '720x' }} 720w,{%- endif -%} {%- if product_card_product.media[1].width >= 940 -%}{{ product_card_product.media[1] | img_url: '940x' }} 940w,{%- endif -%} {%- if product_card_product.media[1].width >= 1066 -%}{{ product_card_product.media[1] | img_url: '1066x' }} 1066w{%- endif -%}" src="{{ product_card_product.media[1] | img_url: '533x' }}" sizes="(min-width: {{ settings.page_width }}px) {{ settings.page_width | minus: 130 | divided_by: 4 }}px, (min-width: 990px) calc((100vw - 130px) / 4), (min-width: 750px) calc((100vw - 120px) / 3), calc((100vw - 35px) / 2)" alt="{{ product_card_product.media[1].alt | escape }}" loading="lazy" class="motion-reduce" width="{{ product_card_product.media[1].width }}" height="{{ product_card_product.media[1].height }}">
+                            {%- endif -%}
+                        </div>
+                    </div>
+                    
+                {%- else -%}
+                    <div class="card__content">
+                        <h2 class="card__text h3">{{ product_card_product.title }}</h2>
+                    </div>
+                {%- endif -%}
+
+                <div class="card__badge">
+                    {%- if product_card_product.available == false -%}
+                        <span aria-hidden="true" class="badge badge--bottom-left color-{{ settings.sold_out_badge_color_scheme }}">{{ 'products.product.sold_out' | t }}</span>
+                    {%- elsif product_card_product.compare_at_price > product_card_product.price and product_card_product.available -%}
+                        <span aria-hidden="true" class="badge badge--bottom-left color-{{ settings.sale_badge_color_scheme }}">{{ 'products.product.on_sale' | t }}</span>
+                    {%- endif -%}
+                </div>
+            </div>
+        </div>
+
+        <div class="card-information">
+            <div class="card-information__wrapper">
+                {%- if show_vendor -%}
+                    <span class="visually-hidden">{{ 'accessibility.vendor' | t }}</span>
+                    <div class="caption-with-letter-spacing light">{{ product_card_product.vendor }}</div>
+                {%- endif -%}
+
+                {%- if product_card_product.featured_media -%}
+                    <span class="card-information__text h5">
+                        {{ product_card_product.title | escape }}
+                    </span>
+                {%- endif -%}
+
+                {% comment %} TODO: metafield {% endcomment %}
+                <span class="caption-large light">{{ block.settings.description | escape }}</span>
+
+                {% render 'price', product: product_card_product, price_class: '' %}
+
+                {% if pr_category_enabled == true and product_id != blank %}
+                    <!-- start_pwr_category_snippet -->
+                    <div class="em-pwr-container--card">
+                        <div class="pwr-category-snippets" style="">
+                            <div id="snippet-{{ product_id }}"></div>
+                        </div>
+                    </div>
+                    <!-- end_pwr_category_snippet -->
+                {% endif %}
+            </div>
+        </div>
+    </a>
+</div> 
+
+
+{%- unless section.settings.oneclickfeature -%}
+<div {% if product_card_product.tags contains 'Custom Collection' %} style="display: none;" {%endif%}>
+    <div class="oneclickproduct">
+        <div class="addtocartbutton">
+            <a href="javascript:void(0)" class="addtocart" onclick="addtocart('{{product_card_product.first_available_variant.id}}')" data-variant-id="{{product_card_product.first_available_variant.id}}">
+                <img src="{{ 'addtocart.png' | asset_img_url: 'master' }}" alt="add to cart" class="addtocartimage">
+            </a>
+        </div>
+        <div class="addedtocartbutton" style="display: none;">
+            <a href="javascript:void(0)" class="addedtocart" onclick="removecart('{{product_card_product.first_available_variant.id}}')" data-variant-id="{{product_card_product.first_available_variant.id}}"> 
+                <img src="{{ 'cart-icon.png' | asset_img_url: 'master' }}" alt="added to cart" class="addedtocartimage">
+            </a>
+        </div>
+    </div>
+</div>
+{% endunless %}
+
+<style>
+    
+    .card-information__wrapper > .price{
+        display: inline-block;
+    }
+    .oneclick-product .oneclickproduct{
+        display: none;
+    }
+    li.grid__item {
+        position: relative;
+    }
+    img.addtocartimage, img.addedtocartimage {
+        width: 50px;
+    }
+    .addtocartbutton {
+        position: absolute;
+        right: 10px;
+        bottom: 30px;
+        border: 1px solid #000;
+        border-radius: 50%;
+        line-height: 75px;
+        height: 50px;
+    }
+    .addedtocartbutton {
+        background: #226864;
+        width: 50px;
+        height: 50px;
+        position: absolute;
+        right: 10px;
+        bottom: 30px;
+        border-radius: 50%;
+        line-height: 75px;
+    }
+    @media all and (max-width: 991px) {
+        .addtocartbutton, .addedtocartbutton{
+            bottom: 210px;
+        }
+    }
+    @media all and (max-width: 600px) {
+        .addtocartbutton, .addedtocartbutton{
+            bottom: 175px;
+        }
+    }
+
+
+</style>
+
+<script>
+    function cartfetch() {
+        fetch('/cart.js').then(res => res.json()).then(data => {
+            let items = data.items;
+            let itemsCount = data.item_count;
+                items.map((item) => {                    
+                    $(item).each(function(){
+                        $('.addtocart[data-variant-id="' + item.id + '"]').parent().hide();
+                        $('.addedtocart[data-variant-id="' + item.id + '"]').parent().show();
+                    })
+                })
+            if (items.length == 1 ) {
+                console.log("cart item count 1");
+                $(".icon-cart-empty").hide();
+                $(".cart-filled-icnon").show();
+                let html = '<div class="cart-count-bubble"><span aria-hidden="true">'+ itemsCount +'</span><span class="visually-hidden">'+ itemsCount +' items</span></div>';
+                let next = $(".cart-filled-icnon").next();
+                $(html).insertAfter(next);
+
+                // $(".cart-filled-icnon span").append('<div class="cart-count-bubble"><span aria-hidden="true">'+ itemsCount +'</span><span class="visually-hidden">'+ itemsCount +' items</span></div>')
+            }else if(items.length > 1){
+                console.log("cart item count > 1");
+                $(".cart-count-bubble span:nth-child(1)").text(itemsCount);
+            }
+        });
+    }
+    function removecart(var_id) {
+      jQuery.post('/cart/update.js', 'updates['+ var_id +']=0');
+      
+      $('.addedtocart[data-variant-id="' + var_id + '"]').parent().hide();
+      $('.addtocart[data-variant-id="' + var_id + '"]').parent().show();
+      
+      setTimeout(function(){
+        fetch('/cart.js').then(res => res.json()).then(data => {
+        console.log(data.item_count);
+        let itemsCount = data.item_count;
+            if(itemsCount > 0){
+                console.log("greater then 1");
+                $(".cart-count-bubble span:nth-child(1)").text(itemsCount);
+            }else if(itemsCount == 0){
+                console.log("equal to 1");
+                $(".cart-count-bubble").hide();
+                $(".cart-filled-icnon").hide();
+                $(".icon-cart-empty").show();
+                $(".cart-count-bubble span:nth-child(1)").text(itemsCount);
+            }       
+        });
+      },2000);
+          
+    }
+    function addtocart(var_id) {
+        $.ajax({
+            type: 'POST',
+            url: '/cart/add.js',
+            dataType: 'json',
+            data: {
+                id: var_id,
+                quantity: 1,
+            },
+            success: function () {
+                console.log('done');
+                // $('.addtocart[data-variant-id="' + var_id + '"]').parent().hide();
+                // $('.addedtocart[data-variant-id="' + var_id + '"]').parent().show();
+                cartfetch();
+            },
+        });
+    }
+
+    
+    function HideAddtocartButtons() {
+        if (window.location.href.indexOf("liqueur-chocolate-gifts") > -1 || window.location.href.indexOf("design-your-own-premium-chocolate-gift") > -1) {
+            $('.addtocartbutton, .addedtocartbutton').hide();
+        }
+    }
+    $(document).ready(function(){
+        cartfetch();
+        // HideAddtocartButtons();
+    })  
+</script>

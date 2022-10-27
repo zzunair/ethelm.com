@@ -1,0 +1,107 @@
+{% schema %}
+{
+  "name": "Ethel M Allergen Info",
+  "tag": "section",
+  "class": "tw spaced-section"
+}
+{% endschema %}
+
+{% liquid
+  assign categories = ''
+
+  for variant in product.variants
+    assign category = variant.option2 | split: ',' | first | strip
+
+    assign categories = categories | append: category | append: ','
+  endfor
+
+  assign categories = categories | split: ',' | uniq
+%}
+
+<div class="page-width px-8">
+  <h1 id="toc" class="pb-16 text-center">
+    {{ product.title }}
+  </h1>
+  <p class="pb-16 text-body text-3xl">
+    {{ product.description }}
+  </p>
+  <nav class="mb-32 md:column-2 lg:column-3 xl:column-4">
+    {% for iteration_category in categories %}
+      <div class="break-inside-avoid">
+        <h2 class="text-heading py-5 text-center md:text-left text-2xl uppercase font-normal tracking-widest">
+          <a 
+            href="#{{ iteration_category | handle }}"
+            class="pb-1 hover:border-solid hover:border-b-2"
+          >{{ iteration_category }}</a>
+        </h2>
+        <ol class="sm:column-2 md:column pb-5">
+          {% for variant in product.variants %}
+            {% assign product_category = variant.option2 | split: ',' | first | strip %}
+            {% if product_category == iteration_category %}
+              <li class="leading-normal mb-4">
+                <a 
+                  href="#{{ variant.sku | handle }}"
+                  class="text-primary pb-1 border-solid border-b hover:border-b-2"
+                >
+                  {{ variant.option1 | escape }}
+                </a>
+              </li>
+            {% endif %}
+          {% endfor %}
+        </ol>
+      </div>
+    {% endfor %}
+  </nav>
+  {% for iteration_category in categories %}
+    <h2
+      id="{{ iteration_category | handle }}"
+      class="text-heading py-20 text-center text-5xl uppercase font-light tracking-[0.4em]"
+    >
+      <a href="#{{ iteration_category | handle }}">{{ iteration_category }}</a>
+    </h2>
+    <ol>
+      {% for variant in product.variants %}
+        {% assign product_category = variant.option2 | split: ',' | first | strip %}
+        {% if product_category == iteration_category %}
+          <li 
+            id="{{ variant.sku | handle }}"
+            class="grid grid-cols-6 gap-10 ml-0 py-10"
+          >
+            <div class="col-span-6 lg:col-span-2 lg:row-span-2 text-center">
+              <img
+                src="{{ variant.image | img_url: '600x' }}"
+                alt="{{ variant.option1 | escape }}"
+                loading="lazy"
+                width="400"
+                height="{{ 400 | divided_by: variant.image.aspect_ratio | ceil }}"
+                class="w-full max-w-screen-xs h-auto mx-auto"
+              >
+            </div>
+            <div class="col-span-6 lg:col-span-4">
+              <h3 class="col-span-6 lg:col-span-4 text-heading pb-10 text-center lg:text-left text-4xl uppercase font-normal tracking-widest">
+                <a href="#{{ variant.sku | handle }}">
+                  {{ variant.option1 }}
+                </a>
+              </h3>
+              <p class="pb-10 text-body text-3xl">
+                {{ variant.metafields.my_fields.description }}
+              </p>
+              <p class="pb-10 text-body">
+                {{ variant.metafields.my_fields.nutritional_information }}
+              </p>
+              <a 
+                href="#toc"
+                class="text-primary pb-1 border-solid border-b hover:border-b-2"
+              >
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 inline align-text-top" viewBox="0 0 20 20" fill="currentColor">
+                  <path fill-rule="evenodd" d="M3.293 9.707a1 1 0 010-1.414l6-6a1 1 0 011.414 0l6 6a1 1 0 01-1.414 1.414L11 5.414V17a1 1 0 11-2 0V5.414L4.707 9.707a1 1 0 01-1.414 0z" clip-rule="evenodd" />
+                </svg>
+                Back to Top
+              </a>
+            </div>
+          </li>
+        {% endif %}
+      {% endfor %}
+    </ol>
+  {% endfor %}
+</div>

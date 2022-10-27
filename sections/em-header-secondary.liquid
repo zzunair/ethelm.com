@@ -1,0 +1,25 @@
+<div class="em-header-secondary pt-5 page-width">
+    <ul class="flex justify-center md:justify-end items-center">
+        {% for link in linklists[section.settings.menu].links %}
+            <li class="pr-4 last:p-0 text-xl">
+                <a href="{{ link.url }}">{{ link.title }}</a>
+            </li>
+        {% endfor %}
+    </ul>
+</div>
+
+{% schema %}
+{
+    "name": "Ethel M Header Secondary",
+    "tag": "section",
+    "class": "tw",
+    "settings": [
+        {
+            "type": "link_list",
+            "id": "menu",
+            "label": "Menu",
+            "info": "Select a menu for the secondary navigation."
+        }
+    ]
+}
+{% endschema %}

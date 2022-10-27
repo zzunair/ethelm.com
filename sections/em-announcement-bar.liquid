@@ -1,0 +1,137 @@
+{%- for block in section.blocks -%}
+  {%- case block.type -%}
+    {%- when 'announcement' -%}
+    {%- if block.settings.enabled -%}
+      <!-- tailwind component with alpine -->
+      <div
+        class="announcement-bar relative"
+        role="region"
+        aria-label="{{ 'sections.header.announcement' | t }}"
+        {{ block.shopify_attributes }}
+        style="
+          --color-base-text:
+            {{ block.settings.text_color.red }},
+            {{ block.settings.text_color.green }},
+            {{ block.settings.text_color.blue }};
+          --color-base-background-2:
+            {{ block.settings.background_color.red }},
+            {{ block.settings.background_color.green }},
+            {{ block.settings.background_color.blue }};
+        "
+        {% unless request.design_mode %}
+          x-data="{
+            open: $persist(true)
+              .as('{{ block.settings.text | append: block.settings.link | sha1 | prepend: '_' | prepend: block.id }}')
+              .using(sessionStorage)
+          }"
+          x-show="open"
+        {% endunless %}
+      >
+      {%- if block.settings.text != blank -%}
+        <div class="
+          bg-surface text-on-surface
+          selection:bg-on-surface selection:text-surface
+          w-full mx-auto py-3 px-3 sm:px-6 lg:px-8
+          ">
+          <div class="text-center px-16">
+            {%- if block.settings.link != blank -%}
+              <a href="{{ block.settings.link }}" class="focus-inset">
+                {%- endif -%}
+                  <p class="{% if block.settings.header_font_enabled %}font-heading{% endif %} font-medium inline-block text-center">
+                    {{ block.settings.text | escape }}
+                    {%- if block.settings.link != blank -%}
+                    {% render 'em-icon-arrow' class: 'inline-block' %}
+                    {%- endif -%}
+                  </p>
+                {%- if block.settings.link != blank -%}
+              </a>
+            {%- endif -%}
+          </div>
+          {% if block.settings.enable_close %}
+            <div class="no-js:hidden absolute inset-y-0 right-0 p-2 flex m-auto">
+              <button
+                type="button"
+                class="
+                  bg-transparent text-on-surface
+                  hover:bg-on-surface hover:bg-opacity-50 hover:text-surface
+                  flex m-auto p-2 rounded-md focus:outline-none focus:ring-2 focus:ring-on-surface
+                "
+                {% unless request.design_mode %}
+                  @click="open = !open"
+                {% endunless %}
+              >
+                <span class="sr-only">Dismiss</span>
+                {% render 'em-icon-outline-x' class: 'inline-block' %}
+              </button>
+            </div>
+          {% endif %}
+        </div>
+        {%- endif -%}
+      </div>
+    {%- endif -%}
+  {%- endcase -%}
+{%- endfor -%}
+
+{% schema %}
+{
+  "name": "Ethel M Announcements",
+  "class": "tw",
+  "max_blocks": 12,
+  "blocks": [
+    {
+      "type": "announcement",
+      "name": "Announcement",
+      "settings": [
+        {
+          "type": "checkbox",
+          "id": "enabled",
+          "label": "Enable Announcement",
+          "default": true
+        },
+        {
+          "type": "text",
+          "id": "text",
+          "default": "Ethel M Announces…",
+          "label": "Text"
+        },
+        {
+          "type": "checkbox",
+          "id": "header_font_enabled",
+          "label": "Use heading font",
+          "default": true
+        },
+        {
+          "type": "url",
+          "id": "link",
+          "label": "Link"
+        },
+        {
+          "type": "color",
+          "id": "background_color",
+          "label": "Background Color",
+          "default": "#226864"
+        },
+        {
+          "type": "color",
+          "id": "text_color",
+          "label": "Text Color",
+          "default": "#ffffff"
+        },
+        {
+          "type": "checkbox",
+          "id": "enable_close",
+          "label": "Enable Close Button",
+          "default": true
+        }
+      ]
+    }
+  ],
+  "default": {
+    "blocks": [
+      {
+        "type": "announcement"
+      }
+    ]
+  }
+}
+{% endschema %}

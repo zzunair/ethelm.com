@@ -1,0 +1,45 @@
+<div class="em-nutritional_information page-width spaced-section">
+  {%- if section.settings.section_title != blank -%}
+    <h2 class="text-4xl font-semibold mb-12">{{ section.settings.section_title }}</h2>
+  {%- endif -%}
+
+  {%- if section.settings.metafield != blank -%}
+    {% liquid
+      assign namespace = section.settings.metafield | split: '.' | first
+      assign key = section.settings.metafield | split: '.' | last
+    %}
+    <div class="product-details">
+      {{ product.metafields[namespace][key] }}
+      <br>
+      <div class="variantmet">
+        {{product.selected_or_first_available_variant.metafields.my_fields.nutritional_information}}
+      </div>
+    </div>
+  {%- endif -%}
+</div>
+
+{% schema %}
+{
+  "name": "Ethel M Nutritional Info",
+  "class": "tw",
+  "settings": [
+    {
+      "type": "text",
+      "id": "section_title",
+      "label": "Title"
+    },
+    {
+      "type": "text",
+      "id": "metafield",
+      "label": "Nutritional Info Metafield",
+      "info": "Define a namespace and key (period-delimited) for the product metafield which contains the nutritional information",
+      "default": "my_fields.nutritional_information"
+    }
+  ],
+  "presets": [
+    {
+      "name":"Ethel M Nutritional Info"
+    }
+  ]
+}
+{% endschema %}

@@ -1,0 +1,50 @@
+<div class="build-a-box-steps p-5 mx-auto my-20 text-center">
+  <h1 class="text-3xl	my-2 normal-case tracking-normal">{{ section.settings.title }}</h1>
+  {% if request.page_type == 'collection' %}
+  <p>{{ section.settings.step_1 }}</p>
+  {% elsif request.page_type == 'product' %}
+  <p>{{ section.settings.step_2 }}</p>
+  {% endif %}
+  <div class="flex gap-2 my-5">
+    <div class="build-a-box-steps__bar w-1/2 rounded-full overflow-hidden	bg-on-surface bg-opacity-10">
+      <span class="build-a-box-steps__indicator block rounded-full w-full h-7 bg-primary {% unless product %} w-1/6 animate-pulse{% endunless %}"></span>
+    </div>
+
+    <div class="build-a-box-steps__bar w-1/2 rounded-full overflow-hidden	bg-on-surface bg-opacity-10">
+      <span class="build-a-box-steps__indicator block rounded-full w-full h-7 {% if product %} w-1/6 animate-pulse bg-primary{% endif %}"></span>
+    </div>
+  </div>
+</div>
+
+{% schema %}
+{
+  "name": "Ethel M Build a Box Steps",
+  "class": "spaced-section spaced-section--full-width tw",
+  "tag": "section",
+  "settings": [
+    {
+      "type": "text",
+      "id": "title",
+      "default": "Create your own personalized chocolate assortment",
+      "label": "Title"
+    },
+    {
+      "type": "text",
+      "id": "step_1",
+      "default": "Step 1 - Select your chocolate gift box",
+      "label": "Step 1"
+    },
+    {
+      "type": "text",
+      "id": "step_2",
+      "default": "Step 2 - Select your chocolates",
+      "label": "Step 2"
+    }
+  ],
+  "presets": [
+    {
+      "name":"Ethel M Build a Box Steps"
+    }
+  ]
+}
+{% endschema %}

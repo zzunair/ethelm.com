@@ -1,0 +1,95 @@
+<div class="em-template-404 flex justify-center flex-col md:flex-row pb-20">
+    <div>
+        <img
+        class="my-0 mx-auto"
+        src="{{ section.settings.image | img_url: 'grande' }}"
+        alt="{{ section.settings.alt }}"
+        width="{{ section.settings.image.width }}"
+        height="{{ section.settings.image.height }}">
+    </div>
+
+    <div class="md:mt-32 md:ml-5">
+        <h1 class="mb-12">{{ section.settings.heading }}</h1>
+        <div class="mb-12">
+            {{ section.settings.description }}
+        </div>
+        <h2>{{ section.settings.continue_message }}</h2>
+        <ul class="mb-12 flex flex-wrap">
+            {%- for block in section.blocks -%}
+                <li>
+                    <a 
+                        class="hover:border-solid hover:border-b pb-2"
+                        href="{{ block.settings.product_url }}">{{ block.settings.product_label }}
+                    </a>
+                    <span class="{% unless forloop.last %}px-2{% endunless %}">{% unless forloop.last %}|{% endunless %}</span>
+                </li>
+            {%- endfor -%}
+        </ul>
+        <div>
+            {{ section.settings.contact_message }}
+        </div>
+    </div>
+</div>
+  
+
+{% schema %}
+{
+    "name": "Ethel M 404",
+    "class": "tw page-width",
+    "tag": "section",
+    "settings": [
+        {
+            "type": "text",
+            "id": "heading",
+            "label": "Heading",
+            "default": "404: Uh oh!"
+        },
+        {
+            "type": "text",
+            "id": "description",
+            "label": "Description"
+        },
+        {
+            "type": "image_picker",
+            "id": "image",
+            "label": "Image"
+        },
+        {
+            "type": "text",
+            "id": "alt",
+            "label": "Image Alt",
+            "default": "Sad saguaro cactus with popped ballon"
+        },
+        {
+            "type": "text",
+            "id": "continue_message",
+            "label": "Continue Message",
+            "default": "Shopping for Chocolate?"
+        },
+        {
+            "type": "text",
+            "id": "contact_message",
+            "label": "Contact Message",
+            "default": "Need Help Finding, Buying or Redeeming?"
+        }
+    ],
+    "blocks": [
+        {
+            "type": "product",
+            "name": "Product",
+            "settings": [
+                {
+                    "type": "text",
+                    "id": "product_label",
+                    "label": "Product Label"
+                },
+                {
+                    "type": "url",
+                    "id": "product_url",
+                    "label": "Product Url"
+                }
+            ]
+        }
+    ]
+}
+{% endschema %}

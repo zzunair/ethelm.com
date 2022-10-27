@@ -1,0 +1,352 @@
+{{ 'component-cart.css' | asset_url | stylesheet_tag }}
+{{ 'component-totals.css' | asset_url | stylesheet_tag }}
+{{ 'component-price.css' | asset_url | stylesheet_tag }}
+{{ 'component-discounts.css' | asset_url | stylesheet_tag }}
+
+<script type="module" src="{{ 'em-cart.js' | asset_url }}"></script>
+
+<div
+  class="page-width{% if cart == empty %} is-empty{% endif %}"
+  id="main-cart-footer"
+  data-id="{{ section.id }}"
+  x-data="note({
+    message: {{ cart.note | default: '' | json | escape }},
+  })"
+>
+  {%- if section.settings.show_cart_note and cart != empty -%}
+    <div class="tw">
+      <div class="flex justify-center" x-ref="container">
+        <div>
+          <div class="flex flex-wrap justify-between mt-8 md:mt-0">
+            <label for="Cart-note">
+              Gift Message
+            </label>
+            <span>
+              <span
+                class="text-primary"
+                x-show="valid && saved"
+              >
+                <svg xmlns="http://www.w3.org/2000/svg" class="inline align-text-top h-6 w-6" viewBox="0 0 20 20" fill="currentColor">
+                  <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd" />
+                </svg>
+                Saved
+              </span>
+              <span
+                x-cloak
+                x-show="valid && !saved"
+              >
+                <svg xmlns="http://www.w3.org/2000/svg" class="inline align-text-top h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
+                </svg>
+                Saving…
+              </span>
+              <span
+                x-cloak
+                x-show="!valid"
+                class="text-error"
+              >
+                <svg xmlns="http://www.w3.org/2000/svg" class="inline align-text-top h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                </svg>
+                Too many lines
+              </span>
+            </span>
+          </div>
+          <textarea
+            x-ref="textarea"
+            x-model="message"
+            @keyup.debounce.300ms="commit()"
+            @blur="commit()"
+            cols="75"
+            rows="3"
+            maxlength="255"
+            {% comment %} :style="validateMessage ? '' : 'color: red; border: 1px solid red'" {% endcomment %}
+            class="block w-[77ch] min-h-[unset] my-4 resize-none py-[0.5ex] px-[1ch] font-mono text-[1em] leading-[1.75] outline focus:outline-thick focus:shadow-lg"
+            :class="{
+              'bg-error bg-opacity-10 outline-error focus:outline-error-thick': !valid
+            }"
+            style="-webkit-text-size-adjust: none;"
+            :style="{ 'font-size': textAreaFontSize }"
+            name="note"
+            id="Cart-note"
+          >
+            {{- cart.note -}}
+          </textarea>
+          <div
+            class="text-center"
+            :class="!valid && 'text-error'"
+          >
+            Gift messages may be up to 3 lines long, with 75 characters per line. Lines Remaining: <span x-text="linesRemaining"></span><br>
+            Please note, Emoji are invalid characters and will not be printed.
+          </div>
+        </div>
+      </div>
+    </div>
+  {%- endif -%}
+
+  <div class="cart__footer">
+    <div class="center">
+      <div class="iweb-order-delivery-dt-pro hidden">&nbsp;</div>
+      {% if settings.custom_delivery_date_enabled %}
+        <div
+          class="tw"
+          x-data="calendar({
+            designMode: {{ request.design_mode | json | escape }},
+            trimEmptyWeeks: {{ settings.custom_delivery_date_trim | json | escape }},
+            showToday: {{ settings.custom_delivery_date_show_today | json | escape }},
+          })"
+        >
+          <div class="text-left">
+            {{ 'custom_delivery_date.explanation_html' | t }}
+          </div>
+          <button
+            class="button w-full my-10"
+            @click="open = !open"
+          >
+            <svg xmlns="http://www.w3.org/2000/svg" class="inline align-text-top h-6 w-6 mr-2 mb-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+            </svg>
+            <span>{{ 'custom_delivery_date.toggle_button' | t }}</span>
+          </button>
+          <div x-show="open" class="mb-10" x-collapse>
+            <template x-for="month in calendar">
+              <div class="max-w-[36rem] mx-auto mb-6">
+                <p x-text="month.name" class="mb-3 font-bold"></p>
+                <div class="grid grid-cols-7 gap-2 w-full m-0 mb-3 font-bold text-primary">
+                  <div>S</div>
+                  <div>M</div>
+                  <div>T</div>
+                  <div>W</div>
+                  <div>T</div>
+                  <div>F</div>
+                  <div>S</div>
+                </div>
+                <div class="w-full m-0">
+                  <template x-for="week in month.weeks">
+                    <div class="grid grid-cols-7 gap-2 w-full m-0 mb-2">
+                      <template x-for="day in week">
+                        <div class="relative pt-full h-0">
+                          <div
+                            x-show="day.inCurrentMonth"
+                            @click="day.selectable && $store.customDeliveryDate.select(day.mmddyyyy)"
+                            :class="{
+                              'border border-secondary cursor-pointer hover:ring-1 hover:ring-secondary': day.selectable,
+                              'bg-secondary text-on-secondary': day.requested,
+                              'bg-secondary bg-opacity-10 text-secondary rounded-full': day.today,
+                              'em-calender--blocked font-light': ! day.selectable,
+                            }"
+                            class="flex absolute top-0 left-0 w-full h-full"
+                          >
+                            <span
+                              x-text="day.date"
+                              class="m-auto leading-none font-heading"
+                            ></span>
+                          </div>
+                        </div>
+                      </template>
+                    </div>
+                  </template>
+                </div>
+              </div>
+            </template>
+          </div>
+          <div
+            x-cloak
+            x-show="$store.customDeliveryDate.requested !== null || $store.customDeliveryDate.committed !== null"
+          >
+            <div class="py-5 px-2 mb-10 bg-surface">
+              <span
+                x-show="$store.customDeliveryDate.requested !== null"
+                class="text-bold md:block"
+              >
+                Desired Delivery Date:
+              </span>
+              <span x-text="$store.customDeliveryDate.requested"></span>
+              <span>
+                <span
+                  class="text-primary"
+                  x-show="!$store.customDeliveryDate.committing"
+                >
+                  <svg xmlns="http://www.w3.org/2000/svg" class="inline align-text-top h-6 w-6 mr-1" viewBox="0 0 20 20" fill="currentColor">
+                    <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd" />
+                  </svg>
+                  Saved
+                </span>
+                <span
+                  x-cloak
+                  x-show="$store.customDeliveryDate.committing"
+                >
+                  <svg xmlns="http://www.w3.org/2000/svg" class="inline align-text-top h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
+                  </svg>
+                  Saving…
+                </span>
+              </span>
+            </div>
+
+            <div x-show="$store.customDeliveryDate.requested !== null" class="text-left">
+              {{ 'custom_delivery_date.express_shipping_html' | t }}
+            </div>
+          </div>
+        </div>
+      {% endif %}
+    </div>
+
+    <div class="cart__blocks" style="position: relative;">
+      <p id="shippingtext" style="display: block;">{{section.settings.firstpart}}</p>
+      <p id="shippingtext2" style="display: none;">{{section.settings.secondpart}}</p>
+      {% for block in section.blocks %}
+        {%- case block.type -%}
+          {%- when '@app' -%}
+            {% render block %}
+          {%- when 'subtotal' -%}
+            <div class="js-contents" {{ block.shopify_attributes }}>
+              <div class="totals">
+                <h3 class="totals__subtotal">{{ 'sections.cart.subtotal' | t }}</h3>
+                <p class="totals__subtotal-value">{{ cart.total_price | money_with_currency }}</p>
+              </div>
+
+              <div>
+                {%- if cart.cart_level_discount_applications.size > 0 -%}
+                  <ul class="discounts list-unstyled" role="list" aria-label="{{ 'customer.order.discount' | t }}">
+                    {%- for discount in cart.cart_level_discount_applications -%}
+                      <li class="discounts__discount discounts__discount--end">
+                        {%- render 'icon-discount' -%}
+                        {{ discount.title }}
+                        (-{{ discount.total_allocated_amount | money }})
+                      </li>
+                    {%- endfor -%}
+                  </ul>
+                {%- endif -%}
+              </div>
+
+              <small class="tax-note caption-large rte">
+                {%- if cart.taxes_included and shop.shipping_policy.body != blank -%}
+                  {{ 'sections.cart.taxes_included_and_shipping_policy_html' | t: link: shop.shipping_policy.url }}
+                {%- elsif cart.taxes_included -%}
+                  {{ 'sections.cart.taxes_included_but_shipping_at_checkout' | t }}
+                {%- elsif shop.shipping_policy.body != blank -%}
+                  {{ 'sections.cart.taxes_and_shipping_policy_at_checkout_html' | t: link: shop.shipping_policy.url }}
+                {%- else -%}
+                  {{ 'sections.cart.taxes_and_shipping_at_checkout' | t }}
+                {%- endif -%}
+              </small>
+            </div>
+          {%- else -%}
+
+            <div class="cart__ctas" {{ block.shopify_attributes }}>
+              <noscript>
+                <button type="submit" class="cart__update-button button button--secondary" form="cart">
+                  {{ 'sections.cart.update' | t }}
+                </button>
+              </noscript>
+
+              <button type="submit" class="cart__checkout-button button" name="checkout"{% if cart == empty %} disabled{% endif %} form="cart">
+                {{ 'sections.cart.checkout' | t }}
+              </button>
+            </div>
+
+            {%- if additional_checkout_buttons -%}
+              <div class="cart__dynamic-checkout-buttons additional-checkout-buttons">
+                {{ content_for_additional_checkout_buttons }}
+              </div>
+            {%- endif -%}
+        {%- endcase -%}
+      {% endfor %}
+
+      <div id="cart-errors"></div>
+      <div class="tw">
+        <div
+          class="absolute top-0 left-0 bottom-0 right-0 bg-background opacity-50 cursor-not-allowed transform-gpu scale-110 z-[1]"
+          @click
+          x-cloak
+          x-show="!valid"
+        >
+          &nbsp;
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+<script>
+  window.cartMessageReload = function(){
+    jQuery.getJSON('/cart.js', function(cart) {
+    let currency = cart.currency;
+    let currencySymbol = "";
+    let firstpart = $("#shippingtext").html();
+    let textToReplace = $("#ttr").text()
+    if(currency == "USD"){
+      currencySymbol = '$';
+    }else{
+      currencySymbol = currency;
+    }
+    let subtotal = cart.items_subtotal_price / 100;
+    let cartThreashold = {{section.settings.shipping}};
+    let remainingAmount = cartThreashold - subtotal;
+    let text = firstpart.replace(textToReplace, remainingAmount);
+    if(remainingAmount > 0){
+      $("p#shippingtext")
+      .show()
+      .html(text);
+      $("p#shippingtext2")
+      .hide()
+    }else{
+      $("p#shippingtext")
+      .hide();
+      $("p#shippingtext2")
+      .show();
+    }
+});
+  }
+  $(document).ready(function(){
+    window.cartMessageReload();
+  });
+</script>
+
+{% schema %}
+{
+    "name": "t:sections.main-cart-footer.name",
+    "class": "cart__footer-wrapper",
+    "settings": [
+        {
+            "type": "checkbox",
+            "id": "show_cart_note",
+            "default": true,
+            "label": "t:sections.main-cart-footer.settings.show_cart_note.label"
+        },
+        {
+            "type": "text",
+            "id": "shipping",
+            "label": "Free Shipping Threshold",
+            "info": "Add the minimum dollar value required for the customer to receive free shipping. Add the number only. No currency symbols or punctuation."
+        }, 
+        {
+            "type": "html",
+            "id": "firstpart",
+            "label": "Free Shipping Threshold Message Text",
+            "info": "Use HTML to add formatting and styling to the text. “$<span id='ttr' style='color: red;'><strong>price</strong></span>” is the line of code for the Free Shipping Threshold Value. Make sure it is included in the entry field where you want the dollar amount to appear within the message."
+        },
+        {
+          "type": "text",
+          "id": "secondpart",
+          "label": "Free Shipping Threshold Reached Text",
+          "default": "You’re getting Free Shipping!"
+        }
+    ],
+    "blocks": [
+        {
+            "type": "subtotal",
+            "name": "t:sections.main-cart-footer.blocks.subtotal.name",
+            "limit": 1
+        }, 
+        {
+            "type": "buttons",
+            "name": "t:sections.main-cart-footer.blocks.buttons.name",
+            "limit": 1
+        }, 
+        {
+            "type": "@app"
+        }
+    ]
+}
+{% endschema %}

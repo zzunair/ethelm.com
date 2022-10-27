@@ -1,0 +1,48 @@
+
+<div class="header--newsletter tw">
+  <div class="flex-column md:flex text-center color-background-2 justify-center p-6">
+    <h2 class="font-light text-[1.8rem] font-heading mb-4 md:mt-auto md:mb-auto md:mr-6">{{ settings.newsletter_header_heading | escape }}</h2>
+    <form action="https://manage.kmail-lists.com/subscriptions/subscribe?a=V5kZdA&g=SKgubS" method="post">
+      <input type="hidden" name="contact[tags]" value="newsletter">
+      <div class="max-w-[36rem] mx-auto">
+        <div class="field">
+          <input
+            x-model="email"
+            x-init="email = $el.value"
+            id="NewsletterForm--{{ id }}"
+            type="email"
+            name="$email"
+            class="field__input min-w-[20rem] em-newsletter--header"
+            value="{{ form.email }}"
+            aria-required="true"
+            autocorrect="off"
+            autocapitalize="off"
+            autocomplete="email"
+            {% if form.errors %}
+              autofocus
+              aria-invalid="true"
+              aria-describedby="ContactHeader-error"
+            {% elsif form.posted_successfully? %}
+              aria-describedby="ContactHeader-success"
+            {% endif %}
+            placeholder="{{ 'newsletter.label' | t }}"
+            required
+          >
+          <label class="field__label" for="NewsletterForm--{{ id }}">
+            {{ 'newsletter.label' | t }}
+          </label>
+          <button type="submit" class="newsletter-form__button field__button" name="commit" id="Subscribe-Header" aria-label="{{ 'newsletter.button_label' | t }}">
+            {% render 'icon-arrow' %}
+          </button>
+        </div>
+        {%- if form.errors -%}
+          <small class="newsletter-form__message form__message" id="ContactHeader-error">{% render 'icon-error' %}{{ form.errors.translated_fields['email'] | capitalize }} {{ form.errors.messages['email'] }}</small>
+        {%- endif -%}
+      </div>
+      {%- if form.posted_successfully? -%}
+        <h3 class="newsletter-form__message newsletter-form__message--success form__message" id="ContactHeader-success" tabindex="-1" autofocus>{% render 'icon-success' %}{{ 'newsletter.success' | t }}</h3>
+      {%- endif -%}
+      <img width="100" height="100" class="hidden" x-bind="directives.image" :src="src" aria-hidden="true">
+    </form>
+  </div>
+</div>

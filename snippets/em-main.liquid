@@ -1,0 +1,25 @@
+<script 
+  id="em-main"
+  type="module" 
+  src="{{ 'em-main.js' | asset_url }}"
+  data-custom-delivery-date='{
+    "enabled": {{ settings.custom_delivery_date_enabled | json | escape }},
+    {% if request.design_mode %}
+      "offset": {{ settings.custom_delivery_date_offset | json | escape }},
+    {% endif %}
+    "fulfillmentDaysMin": {{ settings.custom_delivery_date_minimum | json | escape }},
+    "fulfillmentDaysMax": {{ settings.custom_delivery_date_maximum | json | escape }},
+    "gracePeriod": {{ settings.custom_delivery_date_grace_period | json | escape }},
+    "blockedDates": {{ settings.custom_delivery_date_blocked | json | escape }},
+    "deliveryDateKey": {{ settings.cart_delivery_date_key | json | escape }},
+    "daysOfTheWeek": [
+      {{ settings.custom_delivery_date_sunday }},
+      {{ settings.custom_delivery_date_monday }},
+      {{ settings.custom_delivery_date_tuesday }},
+      {{ settings.custom_delivery_date_wednesday }},
+      {{ settings.custom_delivery_date_thursday }},
+      {{ settings.custom_delivery_date_friday }},
+      {{ settings.custom_delivery_date_saturday }}
+    ]
+  }'>
+</script>

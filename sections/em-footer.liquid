@@ -1,0 +1,124 @@
+{% liquid
+  case section.settings.alignment
+  when 'left'
+    assign textAlign = 'text-left'
+  when 'center'
+    assign textAlign = 'text-center'
+  when 'right'
+    assign textAlign = 'text-right'
+  else
+    assign textAlign = 'text-center'
+  endcase %}
+
+<div class="em-footer h-full">
+  <div class="page-width {{ textAlign }}">
+    <div class="brands-block-container">
+      <h3 class="text-3xl font-body font-semibold mb-6">
+        {{ section.settings.brands_heading }}
+      </h3>
+      <div class="brands">
+        <ul class="list-none">
+          {% for block in section.blocks %}
+            <li class="brand w-28 mr: pl-2.5 inline-block align-top">
+              <a href="{{ block.settings.brand_url }}" target="_blank">
+                <img src="{{ block.settings.brand_logo | img_url: '100x100', scale: '2' }}"
+                   alt="{{ block.settings.brand_logo_alt }}"
+                   width="{{ block.settings.brand_logo.width }}"
+                   height="{{ block.settings.brand_logo.height }}">
+                <span class="sr-only">Opens in a new window</span>
+              </a>
+            </li>
+          {% endfor %}
+        </ul>
+      </div>
+    </div>
+
+    <div class="menu mt-12">
+      <ul class="menu-list list-none">
+        {% for link in linklists[section.settings.footer_menu].links %}
+          <li class="menu-list-item md:pr-5 inline-block">
+            <a href="{{ link.url }}" class="font-body">
+              <span>{{ link.title | strip }}</span>
+              {% unless forloop.last %}
+                <span class="pl-1.5 pr-3 md:hidden">|</span>
+              {% endunless%}
+            </a>
+          </li>
+        {%- endfor -%}
+      </ul>
+    </div>
+    
+    {%- comment -%} oneTrust - Cookie Settings button  {%- endcomment -%}
+    <div class="one-trust mt-12">
+      {% render 'one-trust-button' %}
+    </div>
+
+    <div class="menu my-12 text-lg font-semibold">
+      &copy; {{ 'now' | date: "%Y" }} Mars, Inc. and its affiliates. All rights reserved.
+    </div>
+
+  </div>
+</div>
+
+{% schema %}
+{
+  "name": "Ethel M Footer",
+  "class": "tw",
+  "settings": [
+  {
+    "type": "link_list",
+    "id": "footer_menu",
+    "label": "Menu"
+  },
+  {
+    "type": "text",
+    "id": "brands_heading",
+    "label": "Brands Block Heading",
+    "placeholder": "Visit Our Other Brands"
+  },
+  {
+    "type": "select",
+    "id": "alignment",
+    "label": "Alignment",
+    "options": [
+    {
+      "value": "left",
+      "label": "Left"
+    },
+    {
+      "value": "center",
+      "label": "Center"
+    },
+    {
+      "value": "right",
+      "label": "Right"
+    }
+    ],
+    "default": "center"
+  }
+  ],
+  "blocks": [
+  {
+    "type": "em-brand",
+    "name": "Brand",
+    "settings": [
+    {
+      "type": "image_picker",
+      "id": "brand_logo",
+      "label": "Brand Logo"
+    },
+    {
+      "type": "text",
+      "id": "brand_logo_alt",
+      "label": "Brand Logo Alt Tag"
+    },
+    {
+      "type": "url",
+      "id": "brand_url",
+      "label": "Url"
+    }
+    ]
+  }
+  ]
+}
+{% endschema %}

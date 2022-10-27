@@ -1,0 +1,129 @@
+{% liquid
+  case section.settings.alignment
+  when 'left'
+    assign justify_content = 'md:justify-start'
+  when 'right'
+    assign justify_content = 'md:justify-end'
+  when 'center'
+    assign justify_content = 'md:justify-between'
+  else
+    assign justify_content = 'md:justify-between'
+  endcase %}
+
+<div class="em-shop-by-flavour page-width">
+    <div class="title-wrapper-with-link title-wrapper--self-padded-mobile">
+        <h2 class="em-shop-by-flavour-title">{{ section.settings.title | escape }}</h2>
+    </div>
+
+    <ul class="flavours-list flex justify-start {{ justify_content }} flex-wrap lg:flex-nowrap">
+        {%- for block in section.blocks -%}
+            {% liquid
+              case block.settings.image_alt
+              when ''
+                assign imageAlt = block.settings.name
+              else
+                assign imageAlt = block.settings.image_alt
+              endcase %}
+
+            <li class="cursor-pointer w-1/2 md:w-1/4 lg:w-42">
+               <a class="block" href="{{ block.settings.url }}" {% if block.settings.new_tab == true %}target="_blank"{% endif %}>
+                   <div class="mx-4">
+                        <img src="{{ block.settings.image | img_url: '550x' }}" alt="{{ imageAlt }}" width="{{ block.settings.image.width }}" height="{{ block.settings.image.height }}">
+                        <p class="text-secondary align-middle text-center pt-4 text-4xl">{{ block.settings.name }}</p>
+                   </div>
+               </a> 
+            </li>
+        {%- endfor -%}
+    </ul>
+</div>
+
+{% schema %}
+{
+   "name": "Ethel M Shop By Flavour",
+   "class": "tw",
+   "max_blocks": 8,
+   "settings": [
+     {
+       "type": "text",
+       "id": "title",
+       "label": "Title"
+     },
+     {
+       "type": "select",
+       "id": "alignment",
+       "label": "alignment",
+       "info": "By default, flavours are positioned in the center.",
+       "options": [
+         {
+           "value": "left",
+           "label": "Left"
+         },
+         {
+           "value": "center",
+           "label": "Center"
+         },
+         {
+           "value": "right",
+           "label": "Right"
+         }
+       ],
+       "default": "center"
+     }
+   ],
+   "blocks": [
+     {
+       "type": "flavour",
+       "name": "Flavour",
+       "settings": [
+         {
+           "type": "url",
+           "id": "url",
+           "label": "Item URL"
+         },
+         {
+           "id": "name",
+           "type": "text",
+           "label": "Name"
+         },
+         {
+           "type": "image_picker",
+           "id": "image",
+           "label": "Image"
+         },
+         {
+           "id": "image_alt",
+           "type": "text",
+           "label": "Image Alt Text",
+           "info": "Enter alt text for the image. By default, it will take the flavor label as its alt text."
+         },
+         {
+           "type": "checkbox",
+           "id": "new_tab",
+           "label": "New Tab",
+           "info": "Open Collection in a new tab.",
+           "default": false
+         }
+       ]
+     }
+   ],
+   "presets": [
+     {
+       "name": "Ethel M Shop By Flavour",
+       "blocks": [
+         {
+           "type": "flavour"
+         },
+         {
+           "type": "flavour"
+         },
+         {
+           "type": "flavour"
+         },
+         {
+           "type": "flavour"
+         }
+       ]
+     }
+   ]
+}
+{% endschema %}
